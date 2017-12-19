@@ -13,17 +13,51 @@ var detectNetwork = function(cardNumber) {
   // The American Express network always starts with a 34 or 37 and is 15 digits long
   // Visa always has a prefix of 4 and a length of 13, 16, or 19.
   // MasterCard always has a prefix of 51, 52, 53, 54, or 55 and a length of 16.
+  // Discover always has a prefix of 6011, 644-649, or 65, and a length of 16 or 19.
+  // Maestro always has a prefix of 5018, 5020, 5038, or 6304, and a length of 12-19.
+  // China UnionPay always has a prefix of 622126-622925, 624-626, or 6282-6288 and a length of 16-19
+  // Switch always has a prefix of 4903, 4905, 4911, 4936, 564182, 633110, 6333, or 6759, and a length of 16, 18, or 19.
 
   var network = '';
-  var numberLength = cardNumber.length;
-  if(numberLength === 14 && (cardNumber.slice(0, 2) === '38' || cardNumber.slice(0, 2) === '39')) {
+  var numLen = cardNumber.length;
+  var num = cardNumber;
+  if (numLen === 14 && (num.slice(0, 2) === '38' || num.slice(0, 2) === '39')) {
     network = 'Diner\'s Club';
-  } else if(numberLength === 15 && (cardNumber.slice(0, 2) === '34' || cardNumber.slice(0, 2) === '37')) {
+  } else if(numLen === 15 && (num.slice(0, 2) === '34' || num.slice(0, 2) === '37')) {
     network = 'American Express';
-  } else if((numberLength === 13 || numberLength === 16 || numberLength === 19) && cardNumber.slice(0, 1) === '4') {
-    network = 'Visa';
-  } else if(numberLength === 16 && (cardNumber.slice(0, 2) > Number('50') || cardNumber.slice(0, 2) < Number('56') )) {
+  } else if(numLen === 16 && (num.slice(0, 2) >= '51' && num.slice(0, 2) <= '55')) {
     network = 'MasterCard';
+  } else if((numLen === 16 || numLen === 19) && 
+      (num.slice(0, 4) === '6011' ||
+      (num.slice(0, 3) >= '644' && num.slice(0, 3) <= '649') || 
+       num.slice(0, 2) === '65')) {
+    network = 'Discover';     
+  } else if((numLen >= 12 && numLen <= 19) && 
+    (num.slice(0, 4) === '5018' || 
+    num.slice(0, 4) === '5020' || 
+    num.slice(0, 4) === '5038' || 
+    num.slice(0, 4) === '6304')) {
+    network = 'Maestro';
+  } else if((numLen >= 16 && numLen <= 19) && 
+    (num.slice(0, 3) >= '624' && num.slice(0, 3) <= '626') ||
+    (num.slice(0, 4) >= '6282' && num.slice(0, 4) <= '6288') ||
+    (num.slice(0, 6) >= '622126' && num.slice(0, 6) <= '622925')) {
+    network = 'China UnionPay';
+  } else if((numLen === 16 || numLen === 18 || numLen === 19) &&
+    (num.slice(0, 4) === '4903' || 
+    num.slice(0, 4) === '4905' ||
+    num.slice(0, 4) === '4911' ||
+    num.slice(0, 4) === '4936' || 
+    num.slice(0, 6) === '564182' || 
+    num.slice(0, 6) === '633110' || 
+    num.slice(0, 4) === '6333' || 
+    num.slice(0, 4) === '6759')) {
+    network = 'Switch';
+  } else if(((numLen === 16 || numLen === 19) && 
+    num.slice(0, 1) === '4' && (num.slice(0, 4) !== '4903' && num.slice(0, 4) !== '4905' && 
+    num.slice(0, 4) !== '4911' && num.slice(0, 4) !== '4936')) || 
+    (numLen === 13  && num.slice(0, 1) === '4')) {
+    network = 'Visa';
   }
   return network;
 };
